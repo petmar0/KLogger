@@ -1,4 +1,7 @@
 # KLogger
+
+Bill of Materials: https://docs.google.com/spreadsheets/d/1YfhAMnxGSjogQYJB8nxdOwT9hRkDPhAH9X2B5WJwNII/edit?usp=sharing
+
 Prerequisite libraries:
 - SdFat https://github.com/greiman/SdFat
 - SPI https://www.arduino.cc/en/Reference/SPI
