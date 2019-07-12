@@ -59,9 +59,8 @@ long logMillis = logSeconds * 1000; //Calculates time between logging events in 
              
 void setup() {  //Setup function
   Serial.begin(9600);  // Open serial communications at 9600 bps
-  for (size_t i = 0; i < 8; i++)
-  {
-    ID+=(UniqueID8[i]*256^(i+1));
+  for (size_t i = 0; i < 8; i++){ //For loop for running through the eight registers of the unique ID
+    ID+=(UniqueID8[i]*256^(i+1)); //Add each byte as a hexadecimal place to the ID
   }
   Wire.begin();  //Initialize the I2C interface
   RTC.begin(); //Initialize the RTC 
@@ -82,7 +81,7 @@ void setup() {  //Setup function
   pinMode(S3, OUTPUT);  //Set the pin mode for the S  //Set the pin mode for the S2 pin as output pin as output
   pinMode(sensorOut, INPUT);    //Set the pin mode for the TCS230 output pin as input
   File dataFile = SD.open("datalog.txt", FILE_WRITE); //Start a data file on the SD card
-  dataFile.println(ID);
+  dataFile.println(ID); //Write the unique ID on the first line of the file
   dataFile.println("Time,UTC,T (°C),P (hPa),RH (%),Soil Moisture (LSBs),Red (arbs),Green (arbs),Blue (arbs),White (arbs)");  //Print a header to the data file with column headings
   dataFile.flush(); //Wait for SD write to finish
   dataFile.close(); //Close the data file
