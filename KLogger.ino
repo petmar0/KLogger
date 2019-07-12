@@ -31,6 +31,7 @@ A5 to SCL
 #include <RTClib.h> //Adafruit RTC library for handling the DS1307 on the Nano Logger board
 #include <Adafruit_Sensor.h>  //Adafruit Unified Sensor library
 #include <Adafruit_BME280.h>  //Adafruit BME280 library
+#include <ArduinoUniqueID.h>  //Arduino Unique ID library
 Adafruit_BME280 bme;  //BME280 object instance
 #define BME280_I2C_ADDRESS 0x76 //The I2C address of the BME280 sensor is 0x76 or 0x77 (check both if yours isn't working)
 RTC_DS1307 RTC;   //DS1397 RTC clock object instance
@@ -52,14 +53,20 @@ int g;  //Variable for storing green value
 int b;  //Variable for storing blue value
 int w;  //Variable for storing white value
 long utc; //Variable for storing UTC time
+long ID; //Variable to hold the unique ID of the ATMEGA328p chip on the Arduino
 int logSeconds = 5; //Time in seconds between logging events
 long logMillis = logSeconds * 1000; //Calculates time between logging events in milliseconds, which are compatible with the delay() function
              
 void setup() {  //Setup function
   Serial.begin(9600);  // Open serial communications at 9600 bps
+  for (size_t i = 0; i < 8; i++)
+  {
+    ID+=(UniqueID8[i]*256^(i+1));
+  }
   Wire.begin();  //Initialize the I2C interface
   RTC.begin(); //Initialize the RTC 
   RTC.adjust(DateTime((__DATE__), (__TIME__))); //Sets the RTC to the time the sketch was compiled
+  Serial.println(ID); //Display the unique ID
   Serial.print("Find SD card: "); //Say what we're doing with the SD card
   if (!SD.begin(chipSelect)) { //Initialize and display the status of the SD card
     Serial.println("Card failed");  //Say that we can't talk to the SD card if we can't
@@ -69,13 +76,13 @@ void setup() {  //Setup function
   Serial.print("Logging to microSD card every "); //Prompt that we're logging
   Serial.print(logSeconds); //Say how often we're logging
   Serial.println(" seconds.");  //Specify units
-  Serial.println(); //Skip a line
   bme.begin(BME280_I2C_ADDRESS);  //Start the BME280
   delay(2000);  //Wait so the sensor can initialize 
   pinMode(S2, OUTPUT);  //Set the pin mode for the S2 pin as output
   pinMode(S3, OUTPUT);  //Set the pin mode for the S  //Set the pin mode for the S2 pin as output pin as output
   pinMode(sensorOut, INPUT);    //Set the pin mode for the TCS230 output pin as input
   File dataFile = SD.open("datalog.txt", FILE_WRITE); //Start a data file on the SD card
+  dataFile.println(ID);
   dataFile.println("Time,UTC,T (°C),P (hPa),RH (%),Soil Moisture (LSBs),Red (arbs),Green (arbs),Blue (arbs),White (arbs)");  //Print a header to the data file with column headings
   dataFile.flush(); //Wait for SD write to finish
   dataFile.close(); //Close the data file
