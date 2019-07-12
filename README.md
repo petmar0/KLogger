@@ -1,5 +1,7 @@
 # KLogger
 
+![Logger Picture](/images/box.png)
+
 Bill of Materials: https://docs.google.com/spreadsheets/d/1YfhAMnxGSjogQYJB8nxdOwT9hRkDPhAH9X2B5WJwNII/edit?usp=sharing
 
 Prerequisite libraries:
