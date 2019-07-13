@@ -53,14 +53,14 @@ int g;  //Variable for storing green value
 int b;  //Variable for storing blue value
 int w;  //Variable for storing white value
 long utc; //Variable for storing UTC time
-long ID; //Variable to hold the unique ID of the ATMEGA328p chip on the Arduino
+String ID; //Variable to hold the unique ID of the ATMEGA328p chip on the Arduino
 int logSeconds = 5; //Time in seconds between logging events
 long logMillis = logSeconds * 1000; //Calculates time between logging events in milliseconds, which are compatible with the delay() function
              
 void setup() {  //Setup function
   Serial.begin(9600);  // Open serial communications at 9600 bps
-  for (size_t i = 0; i < 8; i++){ //For loop for running through the eight registers of the unique ID
-    ID+=(UniqueID8[8-i]*256^(i+1)); //Add each byte as a hexadecimal place to the ID
+  for (size_t i = 0; i < 9; i++){ //For loop for running through the eight registers of the unique ID
+    ID+=(UniqueID[9-i]); //Add each byte as a hexadecimal place to the ID
   }
   Wire.begin();  //Initialize the I2C interface
   RTC.begin(); //Initialize the RTC 
