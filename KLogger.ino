@@ -60,7 +60,7 @@ long logMillis = logSeconds * 1000; //Calculates time between logging events in 
 void setup() {  //Setup function
   Serial.begin(9600);  // Open serial communications at 9600 bps
   for (size_t i = 0; i < 8; i++){ //For loop for running through the eight registers of the unique ID
-    ID+=(UniqueID8[i]*256^(i+1)); //Add each byte as a hexadecimal place to the ID
+    ID+=(UniqueID8[8-i]*256^(i+1)); //Add each byte as a hexadecimal place to the ID
   }
   Wire.begin();  //Initialize the I2C interface
   RTC.begin(); //Initialize the RTC 
