@@ -54,8 +54,7 @@ int b;  //Variable for storing blue value
 int w;  //Variable for storing white value
 long utc; //Variable for storing UTC time
 String ID; //Variable to hold the unique ID of the ATMEGA328p chip on the Arduino
-int logSeconds = 5; //Time in seconds between logging events
-long logMillis = logSeconds * 1000; //Calculates time between logging events in milliseconds, which are compatible with the delay() function
+int logSeconds = 600; //Time in seconds between logging events
              
 void setup() {  //Setup function
   Serial.begin(9600);  // Open serial communications at 9600 bps
@@ -89,72 +88,74 @@ void setup() {  //Setup function
 
 void loop() 
 {
-  bmet = (bme.readTemperature()); //Read the temperature in °C
-  bmep = (bme.readPressure() / 100.0F); //Read the barometric pressure in hPa
-  bmerh = (bme.readHumidity()); //Read the humidity in %RH
-  soil = analogRead(0); //Read the soil moisture in LSBs
-  digitalWrite(S2,LOW); //Set the S2 line to LOW
-  digitalWrite(S3,LOW); //Set the S3 line to LOW
-  r = pulseIn(sensorOut, LOW);  //Read the pulse length for the red filtered TCS230 channel
-  digitalWrite(S2,HIGH);  //Set the S2 line to HIGH
-  digitalWrite(S3,HIGH);  //Set the S3 line to HIGH
-  g = pulseIn(sensorOut, LOW);  //Read the pulse length for the green filtered TCS230 channel
-  digitalWrite(S2,LOW); //Set the S2 line to LOW
-  digitalWrite(S3,HIGH);  //Set the S3 line to HIGH
-  b = pulseIn(sensorOut, LOW);  //Read the pulse length for the blue filtered TCS230 channel
-  digitalWrite(S2,HIGH);  //Set the S2 line to HIGH
-  digitalWrite(S3,LOW); //Set the S3 line to LOW
-  w = pulseIn(sensorOut, LOW);  //Read the pulse length for the unfiltered TCS230 channel
   DateTime now = RTC.now(); //Read the time from the RTC
-  utc = (now.unixtime()); //Fill the UTC variable from the RTC
-  sprintf(tmeStrng, "%04d/%02d/%02d,%02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second()); //Concatenate parts into a full time string
-  Serial.print("RTC utc Time: "); //Say what we're displaying  
-  Serial.println(now.unixtime()); //Display the variable contents
-  Serial.print("RTC time: "); //Say what we're displaying
-  Serial.println(tmeStrng); //Display the variable contents
-  Serial.print("BME280 temp: ");  //Say what we're displaying
-  Serial.print(bmet); //Display the variable contents
-  Serial.println(" C"); //Display units
-  Serial.print("Pressure: "); //Say what we're displaying
-  Serial.print(bmep); //Display the variable contents
-  Serial.println(" hPa"); //Display units
-  Serial.print("Humidity: "); //Say what we're displaying
-  Serial.print(bmerh);  //Display the variable contents
-  Serial.println(" %RH"); //Display units
-  Serial.print("Soil Moisture: ");  //Say what we're displaying
-  Serial.print(soil); //Display the variable contents
-  Serial.println(" LSBs");  //Display units
-  Serial.print("Light levels (R,G,B,W): "); //Say what we're displaying
-  Serial.print(r);  //Display variable contents for red
-  Serial.print(",");  //Send a comma
-  Serial.print(g);  //Display variable contents for green
-  Serial.print(",");  //Send a comma
-  Serial.print(b);  //Display variable contents for blue
-  Serial.print(",");  //Send a comma
-  Serial.print(w);  //Display variable contents for white
-  Serial.println(" arbs");  //Display units
-  Serial.println(); //Skip a line
-  File dataFile = SD.open("datalog.txt", FILE_WRITE); //Open the data file on the SD card
-  dataFile.print(tmeStrng); //Write the time
-  dataFile.print(",");  //Write a comma
-  dataFile.print(utc);  //Write the UTC time string
-  dataFile.print(",");  //Write a comma
-  dataFile.print(bmet); //Write the temperature
-  dataFile.print(",");  //Write a comma
-  dataFile.print(bmep); //Write the barometric pressure
-  dataFile.print(",");  //Write a comma
-  dataFile.print(bmerh);  //Write the relative humidity
-  dataFile.print(",");  //Write a comma
-  dataFile.print(soil); //Write the soil moisture
-  dataFile.print(",");  //Write a comma
-  dataFile.print(r);  //Write the red channel value
-  dataFile.print(",");  //Write a comma
-  dataFile.print(g);  //Write the green channel value
-  dataFile.print(",");  //Write a comma
-  dataFile.print(b);  //Write the blue channel value
-  dataFile.print(",");  //Write a comma
-  dataFile.println(w);  //Write the white channel value and end the line
-  dataFile.flush(); //Wait for SD write to finish
-  dataFile.close(); //Close the data file
-  delay(logMillis); //Wait for logMillis milliseconds before taking measurements again and logging the next entry
+  if(now.unixtime()%logSeconds == 0){ //If it's time to log (i.e. now.unixtime() is divisible by logSeconds), then:
+    bmet = (bme.readTemperature()); //Read the temperature in °C
+    bmep = (bme.readPressure() / 100.0F); //Read the barometric pressure in hPa
+    bmerh = (bme.readHumidity()); //Read the humidity in %RH
+    soil = analogRead(0); //Read the soil moisture in LSBs
+    digitalWrite(S2,LOW); //Set the S2 line to LOW
+    digitalWrite(S3,LOW); //Set the S3 line to LOW
+    r = pulseIn(sensorOut, LOW);  //Read the pulse length for the red filtered TCS230 channel
+    digitalWrite(S2,HIGH);  //Set the S2 line to HIGH
+    digitalWrite(S3,HIGH);  //Set the S3 line to HIGH
+    g = pulseIn(sensorOut, LOW);  //Read the pulse length for the green filtered TCS230 channel
+    digitalWrite(S2,LOW); //Set the S2 line to LOW
+    digitalWrite(S3,HIGH);  //Set the S3 line to HIGH
+    b = pulseIn(sensorOut, LOW);  //Read the pulse length for the blue filtered TCS230 channel
+    digitalWrite(S2,HIGH);  //Set the S2 line to HIGH
+    digitalWrite(S3,LOW); //Set the S3 line to LOW
+    w = pulseIn(sensorOut, LOW);  //Read the pulse length for the unfiltered TCS230 channel
+    utc = (now.unixtime()); //Fill the UTC variable from the RTC
+    sprintf(tmeStrng, "%04d/%02d/%02d,%02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second()); //Concatenate parts into a full time string
+    Serial.print("RTC utc Time: "); //Say what we're displaying  
+    Serial.println(now.unixtime()); //Display the variable contents
+    Serial.print("RTC time: "); //Say what we're displaying
+    Serial.println(tmeStrng); //Display the variable contents
+    Serial.print("BME280 temp: ");  //Say what we're displaying
+    Serial.print(bmet); //Display the variable contents
+    Serial.println(" C"); //Display units
+    Serial.print("Pressure: "); //Say what we're displaying
+    Serial.print(bmep); //Display the variable contents
+    Serial.println(" hPa"); //Display units
+    Serial.print("Humidity: "); //Say what we're displaying
+    Serial.print(bmerh);  //Display the variable contents
+    Serial.println(" %RH"); //Display units
+    Serial.print("Soil Moisture: ");  //Say what we're displaying
+    Serial.print(soil); //Display the variable contents
+    Serial.println(" LSBs");  //Display units
+    Serial.print("Light levels (R,G,B,W): "); //Say what we're displaying
+    Serial.print(r);  //Display variable contents for red
+    Serial.print(",");  //Send a comma
+    Serial.print(g);  //Display variable contents for green
+    Serial.print(",");  //Send a comma
+    Serial.print(b);  //Display variable contents for blue
+    Serial.print(",");  //Send a comma
+    Serial.print(w);  //Display variable contents for white
+    Serial.println(" arbs");  //Display units
+    Serial.println(); //Skip a line
+    File dataFile = SD.open("datalog.txt", FILE_WRITE); //Open the data file on the SD card
+    dataFile.print(tmeStrng); //Write the time
+    dataFile.print(",");  //Write a comma
+    dataFile.print(utc);  //Write the UTC time string
+    dataFile.print(",");  //Write a comma
+    dataFile.print(bmet); //Write the temperature
+    dataFile.print(",");  //Write a comma
+    dataFile.print(bmep); //Write the barometric pressure
+    dataFile.print(",");  //Write a comma
+    dataFile.print(bmerh);  //Write the relative humidity
+    dataFile.print(",");  //Write a comma
+    dataFile.print(soil); //Write the soil moisture
+    dataFile.print(",");  //Write a comma
+    dataFile.print(r);  //Write the red channel value
+    dataFile.print(",");  //Write a comma
+    dataFile.print(g);  //Write the green channel value
+    dataFile.print(",");  //Write a comma
+    dataFile.print(b);  //Write the blue channel value
+    dataFile.print(",");  //Write a comma
+    dataFile.println(w);  //Write the white channel value and end the line
+    dataFile.flush(); //Wait for SD write to finish
+    dataFile.close(); //Close the data file
+    delay(1000);  //Delay for one second
+  }
 } 
